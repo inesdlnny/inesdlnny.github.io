@@ -8,5 +8,33 @@
 <body>
     <h1>Interactive Graph</h1>
     <!-- Add the code for your interactive graph here -->
+     <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <div id="plotly-choropleth"></div>
+    <script>
+        import plotly.graph_objs as go
+import plotly.express as px
+
+
+
+fig = px.choropleth(
+    tmdb_5000,
+    locations=con_df['country'],
+    locationmode='country names',
+    color=con_df['num_movies'],
+    title='Movies released per country (excluding US) in The Movie Database 5000',
+    color_continuous_scale='viridis'
+)
+
+fig.update_layout(
+    width=1000,  
+    height=800  
+)
+
+fig.show()
+        var fig = {
+            // Your choropleth map figure object
+        };
+        Plotly.newPlot('plotly-choropleth', fig);
+    </script>
 </body>
 </html>
