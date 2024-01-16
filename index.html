@@ -11,6 +11,43 @@
      <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <div id="plotly-choropleth"></div>
     <script>
+        import pandas as pd
+import pylab
+import matplotlib.pyplot as plt
+import numpy as np
+import calendar
+import seaborn as sns
+
+file_name = 'tmdb_5000_movies.csv'
+tmdb_5000 = pd.read_csv(file_name)
+
+pd.set_option('display.max_columns', None)  
+pd.set_option('display.max_rows', None)  
+
+pd.set_option('display.float_format', lambda x: '%.2f' % x)
+tmdb_5000['release_date'] = pd.to_datetime(tmdb_5000['release_date'], errors='coerce')
+main_columns = ['budget','genres','keywords','original_language','original_title','overview','production_companies','production_countries','spoken_languages','tagline','title','revenue','runtime','vote_average','vote_count','popularity','release_date']
+tmdb_5000 = tmdb_5000.loc[:, main_columns]
+        !pip install plotly
+        import ast
+
+# Convert only non-list entries using ast.literal_eval
+tmdb_5000['production_countries'] = tmdb_5000['production_countries'].apply(
+    lambda x: ast.literal_eval(x) if isinstance(x, str) else x
+)
+
+# Extract country names from the list, if present
+tmdb_5000['production_countries'] = tmdb_5000['production_countries'].apply(
+    lambda x: [i['name'] if isinstance(i, dict) else i for i in x] if isinstance(x, list) and x else x
+)
+        s = tmdb_5000.apply(lambda x: pd.Series(x['production_countries']),axis=1).stack().reset_index(level=1, drop=True)
+s.name = 'countries'
+        con_df = tmdb_5000.drop('production_countries', axis=1).join(s)
+con_df = pd.DataFrame(con_df['countries'].value_counts())
+con_df['country'] = con_df.index
+con_df.columns = ['num_movies', 'country']
+con_df = con_df.reset_index(drop=True)
+        con_df = con_df[con_df['country'] != 'United States of America']
         import plotly.graph_objs as go
 import plotly.express as px
 
